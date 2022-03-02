@@ -30,7 +30,8 @@ namespace soca
             services.AddControllers();
             services.AddDbContext<SocaContext>(
                 options => options.UseSqlServer(
-                    "Data Source=.;Initial Catalog=Soca;User ID=sa;Password=feliz1989;Application Name=SOCA",
+                    @"Data Source =DESKTOP-R12URAM\SQLEXPRESS; Initial Catalog = Soca; User ID = luismany; Password = 12345; Application Name = SOCA"
+                    /*"Data Source=.;Initial Catalog=Soca;User ID=sa;Password=feliz1989;Application Name=SOCA"*/,
                     data => data.MigrationsAssembly("Data")
                 )
             );

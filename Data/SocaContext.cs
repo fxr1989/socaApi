@@ -12,6 +12,8 @@ namespace Data
     public class SocaContext : DbContext
     {
         public DbSet<Tenant> Tenant { get; set; }
+        public DbSet<Facultades> Facultades { get; set; }
+        public DbSet<Especialidad> Especialidad { get; set; }
         public SocaContext(DbContextOptions options): base(options)
         {
 
@@ -20,7 +22,10 @@ namespace Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.ApplyConfiguration(new TenantEstructura());            
+            modelBuilder.ApplyConfiguration(new TenantEstructura());
+            modelBuilder.ApplyConfiguration(new FacultadesEstructura());
+            modelBuilder.ApplyConfiguration(new EspecialidadEstructura());
+            
         }
     }
 }
