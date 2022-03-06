@@ -8,6 +8,7 @@ namespace Data
     {
         public DbSet<Tenant> Tenant { get; set; }
         public DbSet<Facultad> Facultad { get; set; }
+        public DbSet<Asignatura> Asignatura { get; set; }
         public DbSet<Especialidad> Especialidad { get; set; }
         public SocaContext(DbContextOptions options): base(options)
         {
