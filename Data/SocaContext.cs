@@ -1,15 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Modelos;
 using ModelosEstructura;
 
 namespace Data
 {
-    public class SocaContext : DbContext
+    public class SocaContext : IdentityDbContext
     {
         public DbSet<Tenant> Tenant { get; set; }
         public DbSet<Facultad> Facultad { get; set; }
         public DbSet<Asignatura> Asignatura { get; set; }
         public DbSet<Especialidad> Especialidad { get; set; }
+        public DbSet<Usuario> Usuario { get; set; }
         public SocaContext(DbContextOptions options): base(options)
         {
         }
@@ -21,6 +23,7 @@ namespace Data
             modelBuilder.ApplyConfiguration(new FacultadEstructura());
             modelBuilder.ApplyConfiguration(new EspecialidadEstructura());
             modelBuilder.ApplyConfiguration(new AsignaturaEstructura());
+            modelBuilder.ApplyConfiguration(new UsuarioEstructura());
         }
         
     }
