@@ -12,5 +12,7 @@ namespace Repositorios.Contratos
         T EliminarPorId(int id);
         IQueryable<T> ObtenerFiltro(Expression<Func<T, bool>> filtro);
         IQueryable<T> ObtenerTodos();
+        void Guardar();
+        
     }
 }
