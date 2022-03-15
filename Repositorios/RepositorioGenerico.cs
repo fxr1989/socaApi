@@ -50,5 +50,10 @@ namespace Repositorios
             var modelos = db.Set<T>();
             return modelos;
         }
+
+        public void Guardar()
+        {
+            db.SaveChanges();
+        }
     }
 }
