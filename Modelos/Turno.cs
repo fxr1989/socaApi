@@ -13,5 +13,7 @@ namespace Modelos
         public string Descripcion { get; set; }
         public int TenantId { get; set; }
         public virtual Tenant Tenant { get; set; }
+
+        public ICollection<PlanEstudio> PlanEstudios { get; set; }
     }
 }

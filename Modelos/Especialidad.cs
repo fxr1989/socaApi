@@ -14,5 +14,6 @@ namespace Modelos
         public int FacultadId { get; set; }
 
         public virtual Facultad Facultad { get; set; }
+        public ICollection<PlanEstudio> PlanEstudios { get; set; }
     }
 }
