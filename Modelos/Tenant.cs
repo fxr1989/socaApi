@@ -16,5 +16,6 @@ namespace Modelos
         public ICollection<Facultad> Facultades { get; set; }
         public ICollection<Asignatura> Asignaturas { get; set; }
         public ICollection<Turno> Turnos { get; set; }
+        public ICollection<Bloque> Bloques { get; set; }
     }
 }
