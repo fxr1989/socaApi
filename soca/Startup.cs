@@ -1,6 +1,7 @@
 using Data;
 using Dto.Autenticacion;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -37,49 +38,73 @@ namespace soca
                     data => data.MigrationsAssembly("Data")
                 )
             );
+            services
+                .AddIdentity<Usuario, Rol>(options =>
+                {
+                    options.SignIn.RequireConfirmedEmail = true;
+                    options.Password.RequiredLength = 6;
+                    options.Password.RequireLowercase = false;
+                    options.Password.RequireUppercase = false;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireDigit = false;
+                })
+                .AddRoles<Rol>()
+                .AddEntityFrameworkStores<SocaContext>()
+                .AddDefaultTokenProviders();
+
             //Configurar servicio de json web token
             services.Configure<JwtConfiguracion>(Configuration.GetSection("JwtConfig"));
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(jwt => {
-                var key = Encoding.ASCII.GetBytes(Configuration["JwtConfig:Secret"]);
-                jwt.SaveToken = true;
-                jwt.TokenValidationParameters = new TokenValidationParameters
+            services
+                .AddHttpContextAccessor()
+                .AddAuthorization(options =>
                 {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = true,
-                    RequireExpirationTime = false
-                };
-            });
-            //Configuramo los usuarios en el contexto de la base de datos
-            services.AddDefaultIdentity<Usuario>(options => options.SignIn.RequireConfirmedAccount = true)
-                        .AddEntityFrameworkStores<SocaContext>();
+                    options.DefaultPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+                })
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(jwt =>
+                {
+                    var key = Encoding.ASCII.GetBytes(Configuration["JwtConfig:Secret"]);
+                    jwt.RequireHttpsMetadata = false;
+                    jwt.SaveToken = false;
+                    jwt.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        RequireExpirationTime = true
+                    };
+                });
+
+            services.AddHttpClient();
             //Injectamos servicios
             services.AddScoped<IErrorServicio, ErrorServicio>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SocaContext context)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors(builder => {
+                builder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+            });
+
             app.UseHttpsRedirection();
-
+            context.Database.Migrate();
             app.UseRouting();
-
             app.UseAuthentication();
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

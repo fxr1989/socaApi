@@ -10,5 +10,7 @@ namespace Dto.Autenticacion
     {
         public bool Error { get; set; }
         public string Token { get; set; }
+        public int TenantId { get; set; }
+        public string UsuarioId { get; set; }
     }
 }

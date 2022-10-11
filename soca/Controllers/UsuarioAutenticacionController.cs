@@ -1,4 +1,6 @@
-﻿using Dto.Autenticacion;
+﻿using Data;
+using Dto.Autenticacion;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -14,6 +16,7 @@ using System.Threading.Tasks;
 
 namespace soca.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsuarioAutenticacionController : Controller
@@ -24,12 +27,14 @@ namespace soca.Controllers
         public UsuarioAutenticacionController(
             UserManager<Usuario> userManager,
             IOptionsMonitor<JwtConfiguracion> optionsMonitor,                                                     
-            IErrorServicio helperError)
+            IErrorServicio helperError,
+            SocaContext context)
         {
             errorServicio = helperError;
-            usuarioServicio = new UsuarioServicio(userManager, optionsMonitor.CurrentValue, errorServicio);
+            usuarioServicio = new UsuarioServicio(userManager, optionsMonitor.CurrentValue, errorServicio, context);
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [Route("Registrar")]
         public async Task<IActionResult> Registrar([FromBody] UsuarioRegistrarDto usuarioRegistrar) 
@@ -39,6 +44,7 @@ namespace soca.Controllers
             return Ok(resultado);
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login([FromBody] UsuarioLogin usuarioLogin)
@@ -48,6 +54,11 @@ namespace soca.Controllers
             return Ok(resultado);
         }
 
-        
+        [HttpGet]
+        [Route("Ping")]
+        public IActionResult Ping()
+        {
+            return Ok();
+        }
     }
 }

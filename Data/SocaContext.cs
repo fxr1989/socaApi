@@ -12,8 +12,10 @@ namespace Data
         public DbSet<Asignatura> Asignatura { get; set; }
         public DbSet<Especialidad> Especialidad { get; set; }
         public DbSet<Usuario> Usuario { get; set; }
+        public DbSet<Rol> Rol { get; set; }
         public DbSet<PlanEstudio> PlanEstudio { get; set; }
         public DbSet<Bloque> Bloque { get; set; }
+        public DbSet<UsuarioTenant> UsuarioTenant { get; set; }
 
         public SocaContext(DbContextOptions options): base(options)
         {
@@ -29,6 +31,7 @@ namespace Data
             modelBuilder.ApplyConfiguration(new UsuarioEstructura());
             modelBuilder.ApplyConfiguration(new PlanEstudioEstructura());
             modelBuilder.ApplyConfiguration(new BloqueEstructura());
+            modelBuilder.ApplyConfiguration(new UsuarioEstructura());
         }
         
     }
