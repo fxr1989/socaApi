@@ -12,5 +12,6 @@ namespace Dto.Autenticacion
         public string Token { get; set; }
         public int TenantId { get; set; }
         public string UsuarioId { get; set; }
+        public string NombreTenant { get; set; } 
     }
 }

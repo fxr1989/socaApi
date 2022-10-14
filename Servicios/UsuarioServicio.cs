@@ -54,7 +54,7 @@ namespace Servicios
                 Nombre = usuarioRegistrar.Nombre,
                 Apellido = usuarioRegistrar.Apellido,
                 Email = usuarioRegistrar.Email,
-                UserName = usuarioRegistrar.UserName
+                UserName = usuarioRegistrar.UserName,                
             };
             var existeEmial = await userManager.FindByEmailAsync(usuarioRegistrar.Email);
             if (existeEmial != null) errorServicio.AgregarError($"El email {usuarioRegistrar.Email} ya se encuentra registrado");
@@ -66,7 +66,7 @@ namespace Servicios
                 Descripcion = usuarioRegistrar.DescripcionTenant,
                 Email = usuarioRegistrar.Email
             };
-            var usuarioCreado = await userManager.CreateAsync(nuevoUsuario);
+            var usuarioCreado = await userManager.CreateAsync(nuevoUsuario, usuarioRegistrar.Password);
             db.Tenant.Add(nuevoTenant);
             if (errorServicio.TieneError()) return null;
             db.SaveChanges();
@@ -83,7 +83,8 @@ namespace Servicios
                 Error = false,
                 Token = token,
                 TenantId = nuevoTenant.Id,
-                UsuarioId = nuevoUsuario.Id
+                UsuarioId = nuevoUsuario.Id,
+                NombreTenant = nuevoTenant.Nombre
             };
         }
 
@@ -97,7 +98,14 @@ namespace Servicios
             var passwordCorrecto = await userManager.CheckPasswordAsync(usuarioExiste, usuarioLogin.Password);
             if (!passwordCorrecto) errorServicio.AgregarError("Password Incorrecto");
             if (errorServicio.TieneError()) return null;
-            var tenant = db.UsuarioTenant.FirstOrDefault(x => x.UsuarioId == usuarioExiste.Id);
+            var tenant = (from usuarioTenant in db.UsuarioTenant.AsNoTracking()
+                          join empresa in db.Tenant.AsNoTracking() on usuarioTenant.TenantId equals empresa.Id
+                          where usuarioTenant.UsuarioId == usuarioExiste.Id
+                          select new
+                          {
+                              empresa.Id,
+                              empresa.Nombre
+                          }).FirstOrDefault();                         
             if(tenant == null) errorServicio.AgregarError("Usuario no tiene asociado un tenant");
             var token = GenerateJwtToken(usuarioExiste);
             return new UsuarioTokenDto
@@ -105,7 +113,8 @@ namespace Servicios
                 Error = false,
                 Token = token,
                 TenantId = tenant.Id,
-                UsuarioId  = usuarioExiste.Id
+                UsuarioId  = usuarioExiste.Id,
+                NombreTenant = tenant.Nombre
             };
         }
 

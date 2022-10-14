@@ -1,5 +1,6 @@
 ﻿using Data;
 using Dto.Autenticacion;
+using Dto.Error;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -40,7 +41,7 @@ namespace soca.Controllers
         public async Task<IActionResult> Registrar([FromBody] UsuarioRegistrarDto usuarioRegistrar) 
         {
             var resultado = await usuarioServicio.Registrar(usuarioRegistrar);
-            if(errorServicio.TieneError()) return BadRequest(errorServicio.ObtenerError());
+            if (errorServicio.TieneError()) return BadRequest(new ErrorRequest { Error = true, Mensaje = errorServicio.ObtenerError() });
             return Ok(resultado);
         }
 
@@ -50,7 +51,7 @@ namespace soca.Controllers
         public async Task<IActionResult> Login([FromBody] UsuarioLogin usuarioLogin)
         {
             var resultado = await usuarioServicio.Login(usuarioLogin);
-            if (errorServicio.TieneError()) return BadRequest(errorServicio.ObtenerError());
+            if (errorServicio.TieneError()) return BadRequest(new ErrorRequest { Error = true, Mensaje = errorServicio.ObtenerError() });
             return Ok(resultado);
         }
 
